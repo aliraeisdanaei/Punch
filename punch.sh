@@ -55,7 +55,7 @@ function init_entry {
 }
 
 function punch_in {
-    echo $lastline
+    # echo $lastline
     if [ "$lastline_day" == "Day" ]
     then 
         init_entry
@@ -83,7 +83,7 @@ function punch_in {
 
 function punch_out {
     #checks to see if there has been no sign in for today
-    echo $lastline
+    # echo $lastline
     if [ "$lastline_day" == "Day" ]
     then 
         echo "You must punch in before punching out."
@@ -126,8 +126,8 @@ function output_hours_worked {
 
 
 function output_todays_record {
-    echo $lastline
-    echo $lastline_day $lastline_month $lastline_year
+    #echo $lastline
+    #echo $lastline_day $lastline_month $lastline_year
     if [ "$lastline_day" == "Day" ]
     then
         echo "There is no record for today yet."
