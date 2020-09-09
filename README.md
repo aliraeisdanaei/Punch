@@ -7,4 +7,13 @@ The script works with a text based menu as well as with arguments.
 
 The spreadsheet is kept under ~/Productivity under the name work_times.xlsx. If the file or the directory is not present, it will make these files upon running the script, and it will initialise them with a basic header. 
 
+## Important
+The script is limited to only echoing text to the spreadsheet. As a result any changes to the last line of the spreadsheet by the user outside of the script could result in the script crashing. 
+
+The user should refrain from doing so, but instead use the remote punch feature. 
+
+The spreadsheet can be modified on all other lines except for the last line. 
+
+## Back Up
+There is a hidden back up spreadsheet created on every new day of punch.
 
