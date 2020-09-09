@@ -1,87 +1,5 @@
 #!/bin/bash
 
-crnt_date=`date +%F`
-#checks to see if there has already been a punch in recorded
-lastline=`tail -1 ~/Productivity/work_times.xlsx`
-lastline_day=`echo  $lastline | cut -d "," -f1`
-lastline_month=`echo  $lastline | cut -d "," -f2`
-lastline_year=`echo  $lastline | cut -d "," -f3`
-
-
-
-function punch_in {
-clear
-    if [ $lastline_day == `date +%d` ] && [ $lastline_month == `date +%m` ] && [ $lastline_year == `date +%Y` ]
-    then
-        echo "You have already punched in at `echo  $lastline | cut -d "," -f4`. You will be redirected shortly. "
-        echo -n "Press enter to go back to menu "
-        read x
-        menu
-    else
-        echo `date +%d`,`date +%m`,`date +%Y`,`date +%R` >> ~/Productivity/work_times.xlsx
-        echo "Your have punched in. Remember to punch out when you are done."
-        echo "Punch in time: `date +%R`"
-        exit
-    fi
-}
-
-function punch_out {
-    
-    if ! [[ -f ~/.$crnt_date ]]
-    then
-        echo "You must punch in before punching out."
-        echo -n "Press enter to go back to menu "
-        read x
-        menu
-    fi
-
-    
-
-    
-}
-
-function output_hours_worked {
-    echo hi
-    
-}
-
-function goto_break {
-    echo hi
-
-}
-
-function menu {
-    clear
-    echo "#### PUNCH PUNCH PUNCH PUNCH"
-    echo "(1) Punch in"
-    echo "(2) Punch out"
-    echo "(3) Break"
-    echo "(4) Quit"
-    echo -n "Enter option: "
-    read option
-
-
-    case $option in 
-        1)
-            punch_in
-            ;;
-        2)
-            punch_out
-            ;;
-        3)
-            goto_break
-            ;;
-        4)
-            clear
-            exit
-            ;; 
-        *)
-            echo wrong
-            sleep 3
-            menu
-    esac
-}
-
 function create_fileTemplate {
     echo "Work Times For $USER" > ~/Productivity/work_times.xlsx
     echo "File created on `date`" >> ~/Productivity/work_times.xlsx
@@ -97,9 +15,121 @@ then
     create_fileTemplate
 elif ! [[ -f ~/Productivity/work_times.xlsx ]]
 then
-    #if the file does not exist create it
+#if the file does not exist create it
     create_fileTemplate
 fi
 
-menu
+crnt_date=`date +%F`
+lastline=`tail -1 ~/Productivity/work_times.xlsx`
+lastline_day=`echo  $lastline | cut -d "," -f1`
+lastline_month=`echo  $lastline | cut -d "," -f2`
+lastline_year=`echo  $lastline | cut -d "," -f3`
+num_commas=`echo $lastline| tr -cd , | wc -c`
+
+
+function punch_in {
+    if [ "$lastline_day" != `date +%d` ] || [ "$lastline_month" != `date +%m` ] || [ "$lastline_year" != `date +%Y` ]
+    then
+    #the last line was not today's date so create today's date
+        #new day so there must be a new line
+        echo >> ~/Productivity/work_times.xlsx
+        echo -n `date +%d`,`date +%m`,`date +%Y`,`date +%R` >> ~/Productivity/work_times.xlsx && echo "Your have successfully punched in. Remember to punch out when you are done." && echo "Punch in time: `date +%R`"
+        exit 
+    elif ! [ $((num_commas%2)) -eq 0 ]
+    then
+    #checks to see if there has been no previous entry before attempt to re-enter
+    #odd num_commas
+        echo "You have already punched in."
+        exit 1
+    else
+    #there is no previous entry
+        echo -n ,`date +%R` >> ~/Productivity/work_times.xlsx && echo "Your have successfully re-punched in. Remember to punch out when you are done." && echo "Punch in time: `date +%R`"
+        exit
+    fi
+
+}
+
+function punch_out {
+    #checks to see if there has been no sign in for today
+    if [ "$lastline_day" != `date +%d` ] || [ "$lastline_month" != `date +%m` ] || [ "$lastline_year" != `date +%Y` ]
+    then
+        echo "You must punch in before punching out."
+        exit 2
+    
+    elif [ $((num_commas%2)) -eq 0 ]
+    then
+    #checks to see if there is no exit already recorded
+    #there has is no exit recorded when the commas are even
+        echo "You have already punched out."
+        exit 2
+    else
+        echo -n ,`date +%R` >> ~/Productivity/work_times.xlsx && echo "You have successfully punched out." && echo "Punch out time: `date +%R`"
+        exit
+    fi    
+}
+
+function output_hours_worked {
+    echo this has not been implemented yet
+}
+
+function output_todays_record {
+    if [ "$lastline_day" != `date +%d` ] || [ "$lastline_month" != `date +%m` ] || [ "$lastline_year" != `date +%Y` ]
+    then
+        echo "There is no record for today yet."
+        exit
+    else
+        echo $lastline
+    fi
+}
+
+
+function menu {
+    clear
+    echo "#### PUNCH PUNCH PUNCH PUNCH"
+    echo "(1) Punch in"
+    echo "(2) Punch out"
+    echo "(3) See today's times"
+    echo "(4) Quit"
+    read -p "Enter option: " option
+
+
+    case $option in 
+        1)
+            clear
+            punch_in
+            ;;
+        2)
+            clear
+            punch_out
+            ;;
+        3)
+            output_todays_record
+            ;;
+        4)
+            clear
+            exit
+            ;; 
+        *)
+            echo wrong
+            sleep 3
+            menu
+    esac
+}
+
+
+
+#the direction of program based on the argument sent
+case $1 in 
+    "in")
+        punch_in
+        ;;
+    "out")
+        punch_out
+        ;;
+    "see")
+        output_todays_record
+        ;;
+    *)
+        menu
+esac
 
