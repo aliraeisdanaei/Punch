@@ -4,7 +4,7 @@ function create_fileTemplate {
     echo "Work Times For $USER" > ~/Productivity/work_times.xlsx
     echo "File created on `date`" >> ~/Productivity/work_times.xlsx
     echo >> ~/Productivity/work_times.xlsx
-    echo Day,Month,Year,Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit >> ~/Productivity/work_times.xlsx
+    echo Day,Month,Year,Hours Worked, Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit >> ~/Productivity/work_times.xlsx
 }
 
 #if the directory does not exist create it
@@ -31,14 +31,20 @@ function punch_in {
     if [ "$lastline_day" != `date +%d` ] || [ "$lastline_month" != `date +%m` ] || [ "$lastline_year" != `date +%Y` ]
     then
     #the last line was not today's date so create today's date
-        #new day so there must be a new line
-        echo >> ~/Productivity/work_times.xlsx
-        echo -n `date +%d`,`date +%m`,`date +%Y`,`date +%R` >> ~/Productivity/work_times.xlsx && echo "Your have successfully punched in. Remember to punch out when you are done." && echo "Punch in time: `date +%R`"
+        echo -n `date +%d`,`date +%m`,`date +%Y`>> ~/Productivity/work_times.xlsx
+        
+        #the formula
+        numline=`wc -l < ~/Productivity/work_times.xlsx`
+        let "numline = $numline + 1" 
+        formula="=((F$numline-E$numline)+(H$numline-G$numline)+(J$numline - I$numline)+(L$numline - K$numline)+(N$numline - M$numline))*24"
+        echo -n ,$formula >> ~/Productivity/work_times.xlsx
+
+        echo -n ,`date +%R` >> ~/Productivity/work_times.xlsx && echo "Your have successfully punched in. Remember to punch out when you are done." && echo "Punch in time: `date +%R`"
         exit 
-    elif ! [ $((num_commas%2)) -eq 0 ]
+    elif [ $((num_commas%2)) -eq 0 ]
     then
     #checks to see if there has been no previous entry before attempt to re-enter
-    #odd num_commas
+    #even num_commas
         echo "You have already punched in."
         exit 1
     else
@@ -56,10 +62,10 @@ function punch_out {
         echo "You must punch in before punching out."
         exit 2
     
-    elif [ $((num_commas%2)) -eq 0 ]
+    elif ! [ $((num_commas%2)) -eq 0 ]
     then
     #checks to see if there is no exit already recorded
-    #there has is no exit recorded when the commas are even
+    #there has is no exit recorded when the commas are odd
         echo "You have already punched out."
         exit 2
     else
@@ -71,6 +77,7 @@ function punch_out {
 function output_hours_worked {
     echo this has not been implemented yet
 }
+
 
 function output_todays_record {
     if [ "$lastline_day" != `date +%d` ] || [ "$lastline_month" != `date +%m` ] || [ "$lastline_year" != `date +%Y` ]
