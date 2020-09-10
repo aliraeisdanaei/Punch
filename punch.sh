@@ -56,6 +56,7 @@ function init_entry {
 
 function punch_in {
     # echo $lastline
+    count_numFields
     if [ "$lastline_day" == "Day" ]
     then 
         init_entry
@@ -84,6 +85,7 @@ function punch_in {
 function punch_out {
     #checks to see if there has been no sign in for today
     # echo $lastline
+    count_numFields
     if [ "$lastline_day" == "Day" ]
     then 
         echo "You must punch in before punching out."
