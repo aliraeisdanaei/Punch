@@ -4,7 +4,7 @@ function create_fileTemplate {
     echo "Work Times For $USER" > ~/Productivity/work_times.xlsx
     echo "File created on `date`" >> ~/Productivity/work_times.xlsx
     echo >> ~/Productivity/work_times.xlsx
-    echo Day,Month,Year,Hours Worked, Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit >> ~/Productivity/work_times.xlsx
+    echo Day,Month,Year,Hours Worked, Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit >> ~/Productivity/work_times.xlsx
 }
 
 #if the directory does not exist create it
@@ -29,7 +29,7 @@ function count_numFields {
     nxt_field=`echo  $lastline | cut -d "," -f1`
     num_fields=0 
     
-    while [ -n "$nxt_field"]
+    while [ -n "$nxt_field" ]
     do
         let "num_fields=$num_fields+1"
         let "field_index=$num_fields+1"
@@ -37,7 +37,6 @@ function count_numFields {
         nxt_field=`echo  $lastline | cut -d "," -f $field_index`
 
     done
-    echo 
 }
 
 function create_backup {
@@ -45,6 +44,8 @@ function create_backup {
 }
 
 function init_entry {
+    #new line needs to be added
+    echo >> ~/Productivity/work_times.xlsx
     echo -n `date +%d`,`date +%m`,`date +%Y`>> ~/Productivity/work_times.xlsx 
     #the formula
     numline=`wc -l < ~/Productivity/work_times.xlsx`
@@ -123,8 +124,10 @@ function remote_punch {
 }
 
 function output_hours_worked {
-    echo this has not been implemented yet
-}
+    echo "Showing record for: $lastline_day.$lastline_month.$lastline_year"
+    echo "Hours worked: `cat ~/Productivity/work_times.xlsx | tail -1 | cut -d "," -f4`"
+    exit
+}   
 
 
 function output_todays_record {
@@ -141,7 +144,27 @@ function output_todays_record {
         echo "There is no record for today yet."
         exit
     else
-        echo $lastline
+
+        #output today's record
+        echo "Showing record for: $lastline_day.$lastline_month.$lastline_year"
+
+
+        field_index=5 
+        nxt_field=`echo  $lastline | cut -d "," -f $field_index`
+
+        while [ -n "$nxt_field" ]
+        do
+            if [ $((field_index%2)) -eq 0 ]
+            then
+                echo "Exit: $nxt_field"
+            else
+                echo "Entry: $nxt_field"
+            fi
+
+            let "field_index=$field_index+1"
+            nxt_field=`echo  $lastline | cut -d "," -f $field_index`
+
+        done
     fi
 }
 
@@ -153,7 +176,8 @@ function menu {
     echo "(2) Punch out"
     echo "(3) Remote Punch"
     echo "(4) See today's times"
-    echo "(5) Quit"
+    echo "(5) Hours Worked Today"
+    echo "(6) Quit"
     read -p "Enter option: " option
 
 
@@ -173,6 +197,10 @@ function menu {
             output_todays_record
             ;;    
         5)
+            output_hours_worked
+            ;;
+        
+        6)
             clear
             exit
             ;; 
@@ -198,6 +226,10 @@ case $1 in
         ;;
     "rmt")
         remote_punch
+        ;;
+
+    "hrs")
+        output_hours_worked
         ;;
     *)
         menu
