@@ -4,7 +4,7 @@ function create_fileTemplate {
     echo "Work Times For $USER" > ~/Productivity/work_times.xlsx
     echo "File created on `date`" >> ~/Productivity/work_times.xlsx
     echo >> ~/Productivity/work_times.xlsx
-    echo Day,Month,Year,Hours Worked, Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit >> ~/Productivity/work_times.xlsx
+    echo Day,Month,Year,Hours Worked, Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit, Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit,Entry,Exit >> ~/Productivity/work_times.xlsx
 }
 
 #if the directory does not exist create it
@@ -50,7 +50,7 @@ function init_entry {
     #the formula
     numline=`wc -l < ~/Productivity/work_times.xlsx`
     let "numline = $numline + 1" 
-    formula="=((F$numline-E$numline)+(H$numline-G$numline)+(J$numline - I$numline)+(L$numline - K$numline)+(N$numline - M$numline))*24"
+    formula="=((F$numline-E$numline)+(H$numline-G$numline)+(J$numline - I$numline)+(L$numline - K$numline)+(N$numline - M$numline)+(P$numline-O$numline)+(R$numline-Q$numline)+(T$numline-S$numline)+(V$numline-U$numline)+(X$numline-W$numline)+(Z$numline-Y$numline))*24"
     echo -n ,$formula >> ~/Productivity/work_times.xlsx 
     create_backup
 }
