@@ -12,7 +12,7 @@ The spreadsheet is kept under ~/Productivity under the name work_times.xlsx. If 
 ```
 #### PUNCH PUNCH PUNCH PUNCH
 (1) Punch in
-(2) Punch out
+(2) Punch [out](out)
 (3) Remote Punch
 (4) See today's times
 (5) Hours Worked Today
